@@ -1,0 +1,27 @@
+model {
+  for(i in 1:ndata){
+    rt[i] ~ dt(mu[i], 1 / sd.cells^2, nu.cells)
+    mu[i] <- intercept[target.type[i]] + slope[target.type[i]] * setsize[i] + subject.effect[subject[i]]
+  }
+  
+  for(s in 1:nsubjects){
+    subject.effect[s] ~ dnorm(0, 1 / sd.subject^2)
+  }
+  
+  for(t in 1:ntargettypes){
+    intercept[t] ~ dnorm(intercept.group, 1 / sd.intercepts^2)
+    slope[t] ~ dnorm(slope.group, 1 / sd.slopes^2)
+  }
+  
+  sd.cells ~ dgamma(sd.cells.prior.shape, sd.cells.prior.rate) # pass in priors based on data
+  nu.cells ~ dexp(1/30)
+  
+  sd.subject ~ dgamma(sd.subject.prior.shape, sd.subject.prior.rate) # pass in priors based on data
+  
+  intercept.group ~ dnorm( intercept.prior.mean, 1 / intercept.prior.sd^2)
+  slope.group ~ dnorm(slope.prior.mean, 1 / slope.prior.sd^2)
+  
+  sd.intercepts ~ dgamma(1,.001)
+  sd.slopes ~ dgamma(1,.001)
+  
+}
